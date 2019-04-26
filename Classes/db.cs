@@ -17,21 +17,39 @@ namespace draw_board.Classes
             conn = new SqlConnection(connectionString);
         }
 
-        public void insertPath(Path pa , string boardName , string ip)
+        public void deletePathFromDB(int pathId)
+        {
+            using (SqlConnection openCon = new SqlConnection(connectionString))
+            {
+                string deletePath = " DELETE FROM boardpath WHERE path =@path";
+
+                using (SqlCommand query = new SqlCommand(deletePath))
+                {
+                    query.Connection = openCon;
+                    query.Parameters.Add("@path", SqlDbType.Int).Value = pathId;
+                    openCon.Open();
+                    query.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public int insertPath(Path pa, string boardName, string ip)
         {
             insertBoard(boardName);
             int pathId = insertIp(ip, boardName);
             foreach (Point p in pa.pathPoints)
-            {  
-                insertPoint(p,pathId);
+            {
+                if (p != null)
+                    insertPoint(p, pathId);
             }
+            return pathId;
         }
 
         public Path[] getPath(string boardName)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
             {
-                string getPaths = "SELECT path From boardpath where boardname =@boardname";
+                string getPaths = "SELECT path,ip From boardpath where boardname =@boardname";
                 using (SqlCommand query = new SqlCommand(getPaths))
                 {
                     query.Connection = openCon;
@@ -43,10 +61,12 @@ namespace draw_board.Classes
 
                     while (reader.Read())
                     {
-                        Point[] points = getPointsOfPath(Int32.Parse(reader["path"].ToString()));
-                        Path path = new Path(points);
+                        var pathId = Int32.Parse(reader["path"].ToString());
+                        var pathIp = reader["ip"].ToString().Replace("  ", "");
+                        Point[] points = getPointsOfPath(pathId);
+                        Path path = new Path(points, pathIp, pathId);
                         paths.Insert(i++, path);
-                        
+
                     }
 
                     return paths.ToArray();
@@ -75,7 +95,7 @@ namespace draw_board.Classes
                         points.Insert(i++, p);
                     }
 
-                    return points.ToArray() ;
+                    return points.ToArray();
                 }
             }
         }
@@ -84,9 +104,9 @@ namespace draw_board.Classes
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
             {
-                string insertPoint = " If Not Exists (select * from boards where boardname=@boardname) INSERT into boards (boardname) VALUES (@boardname)";
+                string insertBoard = " If Not Exists (select * from boards where boardname=@boardname) INSERT into boards (boardname) VALUES (@boardname)";
 
-                using (SqlCommand query = new SqlCommand(insertPoint))
+                using (SqlCommand query = new SqlCommand(insertBoard))
                 {
                     query.Connection = openCon;
                     query.Parameters.Add("@boardname", SqlDbType.NChar).Value = boardName;
@@ -97,13 +117,13 @@ namespace draw_board.Classes
         }
 
 
-        public int insertIp(string ip ,string boardName)
+        public int insertIp(string ip, string boardName)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
             {
-                string insertPoint = "INSERT into boardpath (boardname,ip) VALUES (@boardname,@ip) SELECT SCOPE_IDENTITY()";
+                string insertIp = "INSERT into boardpath (boardname,ip) VALUES (@boardname,@ip) SELECT SCOPE_IDENTITY()";
 
-                using (SqlCommand query = new SqlCommand(insertPoint))
+                using (SqlCommand query = new SqlCommand(insertIp))
                 {
                     query.Connection = openCon;
                     query.Parameters.Add("@boardname", SqlDbType.NChar).Value = boardName;
@@ -115,8 +135,9 @@ namespace draw_board.Classes
             }
         }
 
-        public void insertPoint(Point p,int pathId)
+        public void insertPoint(Point p, int pathId)
         {
+            //if()
             using (SqlConnection openCon = new SqlConnection(connectionString))
             {
                 string insertPoint = "INSERT into pathinfo (path,x,y) VALUES (@path,@x,@y)";

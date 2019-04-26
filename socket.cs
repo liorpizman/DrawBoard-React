@@ -10,13 +10,20 @@ namespace draw_board
 {
     public class socket : Hub
     {
-        public void SendToAll(string boardname, JProperty p)
+        public void SendToAll(string boardname, JObject p)
         {
-            Path path = Controllers.BoardController.createPath(p);
-            if (path != null)
-            {
-                Clients.All.SendAsync("sendToAll", boardname, path);
-            }
+            JArray points = p["points"] as JArray;
+            Path path = Controllers.BoardController.createPath(points);
+            string ip = p["details"]["ip"].ToObject<string>();
+            int id = p["details"]["id"].ToObject<int>();
+            path.id = id;
+            path.ip = ip;
+            Clients.All.SendAsync("sendToAll", boardname, path);
+        }
+
+        public void removePath(string boardname, int id)
+        {
+            Clients.All.SendAsync("removePath", boardname, id);
         }
     }
 }

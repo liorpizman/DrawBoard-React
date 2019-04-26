@@ -16,29 +16,26 @@ namespace draw_board.Controllers
 
         db DB = new db();
 
-        public static Path createPath(JProperty path) //JArray 
+        public static Path createPath(JArray path)
         {
-            if (path != null)
+            Point[] arr = new Point[path.Count];
+            for (int i = 0; i < path.Count - 2; i++)
             {
-                Point[] arr = new Point[((JArray)path.First).Count];
-                int i = 0;
-                foreach (var item in path.First)
-                {
-                    float x = item["x"].ToObject<float>();
-                    float y = item["y"].ToObject<float>();
-                    arr[i++] = new Point(x, y);
-                }
 
-                return new Path(arr);
+                float x = path[i]["x"].ToObject<float>();
+                float y = path[i]["y"].ToObject<float>();
+                arr[i] = new Point(x, y);
             }
-            return null;
+
+            return new Path(arr);
         }
 
         [HttpPost("[action]")]
-        public void addPath([FromBody] JObject data)
+        public int addPath([FromBody] JObject data)
         {
+            int pathId = -1;
             if (data.Count != 3)
-                return;
+                return -1;
             Object path = data.First;
             Object boardData = ((JProperty)path).Next;
             Object ip = data.Last.ToString();
@@ -58,9 +55,10 @@ namespace draw_board.Controllers
             string boardName = ((JProperty)boardData).Value.ToString();
             if (path != null)
             {
-                Path p = createPath((JProperty)path);
-                DB.insertPath(p, boardName, cIP);
+                Path p = createPath(((JProperty)path).First as JArray);
+                pathId = DB.insertPath(p, boardName, cIP);
             }
+            return pathId;
         }
 
         [HttpPost("[action]")]                                     
@@ -70,6 +68,13 @@ namespace draw_board.Controllers
             Path[] paths = DB.getPath(board);
             return paths;
         }
+
+        [HttpPost("[action]")]
+        public void deletePath([FromBody] int pathId)
+        {
+            DB.deletePathFromDB(pathId);
+        }
+
 
 
         [HttpGet("[action]")]

@@ -54,9 +54,8 @@ export class Home extends Component {
                 <br />
                 <br />
                 <div>
-                    <input className="board-input left-space" type="text" name="title" required='true' placeholder="Choose Board Name" value={this.state.title}
+                    <input className="board-input left-space" type="text" name="title" required={true} placeholder="Choose Board Name" value={this.state.title}
                         onChange={this.handleChange.bind(this)} />
-
                     {this.renderRedirect()}
                     <button className="board-btn left-space" onClick={this.setRedirect}>Start Draw!</button>
                 </div>
