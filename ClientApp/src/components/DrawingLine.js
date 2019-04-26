@@ -3,6 +3,7 @@ import React from "react";
 function deleteLine(e) {
     console.log("working");
 }
+
 export default function DrawingLine(props) {
     /* var lineToDraw = props.line;
      const pathDetails = lineToDraw.getIn([props.line.size - 1]);

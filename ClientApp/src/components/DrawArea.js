@@ -17,6 +17,7 @@ export class DrawArea extends Component {
             mode: "pencil",
             socketConnection: null,
             boardname: this.props.location.state.boardName,
+            numElem: 0,
             clientIP: "8.8.8.8"
         };
         this.getdrawArea = React.createRef();
@@ -69,8 +70,10 @@ export class DrawArea extends Component {
 
     handleMouseUp() { //mouseEvent
         if (this.state.mode === "pencil"/* && !mouseEvent.target.outerHTML.includes("<li")*/) {//tfira al makash delete
-            this.sendPathToServer(this.state.lines.last().points, this.state.boardname, this.state.clientIP);
-            this.setState({ isDrawing: false });
+            if (this.state.lines.last() !== undefined) {
+                this.sendPathToServer(this.state.lines.last().points, this.state.boardname, this.state.clientIP);
+                this.setState({ isDrawing: false });
+            }
         }
     }
     /*
@@ -162,6 +165,23 @@ export class DrawArea extends Component {
             this.sendPathToClients(path);
             });
             */
+        let list = document.getElementsByTagName('path');
+        let countElem = 0;
+        for (let item of list) {
+            let _prop = item.outerHTML;
+            let _ip = _prop.substring(
+                _prop.lastIndexOf("ip=") + 1,
+                _prop.lastIndexOf("id=")
+            );
+            _ip = _ip.replace(/\D/g, '');
+            if (this.state.clientIP.toString() === _ip) {
+                countElem++;
+            }
+        }
+        this.setState({ numElem: countElem });
+        if (this.state.numElem > 4) {
+            return;
+        }
         fetch('api/Board/addPath', {
             method: 'POST',
             body: JSON.stringify({
@@ -173,17 +193,19 @@ export class DrawArea extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(response =>
-                response.json()).then(pathId => {
-                    if (pathId != null) {
-                        this.setState(prevState => {
-                            return {
-                                lines: prevState.lines.updateIn([prevState.lines.size - 1], line => line = { points: line.points, details: { id: pathId, ip: this.state.clientIP } }),
-                            };
-                        });
+            response.json()).then(pathId => {
+                if (pathId != null) {
+                    this.setState(prevState => {
+                        return {
+                            lines: prevState.lines.updateIn([prevState.lines.size - 1], line => line = { points: line.points, details: { id: pathId, ip: this.state.clientIP } }),
+                        };
+                    });
 
-                        this.sendPathToClients(this.state.lines.getIn([this.state.lines.size - 1]));
-                    }
-                });
+                    this.sendPathToClients(this.state.lines.getIn([this.state.lines.size - 1]));
+                }
+            });
+        let countUp = this.state.numElem + 1;
+        this.setState({ numElem: countUp });
     }
 
     deletePath(e) {// e is the path element
@@ -199,6 +221,8 @@ export class DrawArea extends Component {
                 }
             });
             this.deletePathFromClients(e.currentTarget.getAttribute("id"))
+            let countDown = this.state.numElem - 1;
+            this.setState({ numElem: countDown });
         }
     }
 
@@ -231,7 +255,7 @@ export class DrawArea extends Component {
     }
 
     handleMouseMove(mouseEvent) {
-        if (!this.state.isDrawing || this.state.mode === "eraser") {
+        if (!this.state.isDrawing || this.state.mode === "eraser" || this.state.numElem > 4) {
             return;
         }
 
@@ -246,7 +270,7 @@ export class DrawArea extends Component {
     }
 
     handleMouseDown(mouseEvent) {
-        if (mouseEvent.button !== 0 || this.state.mode === "eraser") {
+        if (mouseEvent.button !== 0 || this.state.mode === "eraser" || this.state.numElem > 4) {
             return;
         }
 
@@ -256,8 +280,8 @@ export class DrawArea extends Component {
             return {
                 lines: prevState.lines.push({
                     details: {
-                        id: "",
-                        ip: ""
+                        id: "",                                                               /////////////////////////// check it
+                        ip: this.state.clientIP//""
                     },
                     points: immutable.List([point])
                 }),
@@ -287,6 +311,7 @@ export class DrawArea extends Component {
                 <h1>Welcome!</h1>
                 <h2>Board Name is : <strong>{this.state.boardname}</strong>.</h2>
                 <br />
+                <h5 className="red-color"><strong>You can draw up to 5 different elements on each drawing board!</strong></h5>
                 <div>
                     <ul className="optionsList">
                         <img className="icon-img" src={pencilImg} alt="Pencil" width="30px" height="30px"

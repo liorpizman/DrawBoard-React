@@ -77,3 +77,7 @@ body {
 .icon-img:hover{
     cursor: pointer;
 }
+
+.red-color{
+    color:red;
+}
