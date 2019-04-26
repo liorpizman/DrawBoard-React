@@ -1,0 +1,19 @@
+﻿.footer {
+    background-Color: lightgrey;
+    border-Top: 2px solid #E7E7E7;
+    text-Align: center;
+    padding: 1px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 35px;
+    width: 100%;
+    color: black;
+}
+
+.center {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+}
