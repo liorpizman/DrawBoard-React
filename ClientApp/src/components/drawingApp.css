@@ -4,7 +4,7 @@ body {
   }
 
 .drawArea {
-    width: 85%;
+    width: 80%;
     height: 400px;
     border: 5px solid #111;
     border-radius: 15px;
@@ -67,4 +67,8 @@ body {
 
 .left-space{
     margin-left: 3em;
+}
+
+.icon-img:hover{
+    cursor: pointer;
 }

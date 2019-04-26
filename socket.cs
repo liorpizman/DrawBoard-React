@@ -13,7 +13,10 @@ namespace draw_board
         public void SendToAll(string boardname, JProperty p)
         {
             Path path = Controllers.BoardController.createPath(p);
-            Clients.All.SendAsync("sendToAll", boardname, path);
+            if (path != null)
+            {
+                Clients.All.SendAsync("sendToAll", boardname, path);
+            }
         }
     }
 }

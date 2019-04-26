@@ -18,21 +18,27 @@ namespace draw_board.Controllers
 
         public static Path createPath(JProperty path) //JArray 
         {
-            Point[] arr = new Point[((JArray)path.First).Count];
-            int i = 0;
-            foreach (var item in path.First)
+            if (path != null)
             {
-                float x = item["x"].ToObject<float>();
-                float y = item["y"].ToObject<float>();
-                arr[i++] = new Point(x, y);
-            }
+                Point[] arr = new Point[((JArray)path.First).Count];
+                int i = 0;
+                foreach (var item in path.First)
+                {
+                    float x = item["x"].ToObject<float>();
+                    float y = item["y"].ToObject<float>();
+                    arr[i++] = new Point(x, y);
+                }
 
-            return new Path(arr);
+                return new Path(arr);
+            }
+            return null;
         }
 
         [HttpPost("[action]")]
         public void addPath([FromBody] JObject data)
         {
+            if (data.Count != 3)
+                return;
             Object path = data.First;
             Object boardData = ((JProperty)path).Next;
             Object ip = data.Last.ToString();

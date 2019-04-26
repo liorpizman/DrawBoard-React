@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Drawing from './Drawing.js';
+import pencilImg from '../Resources/pencil.png';
+import eraserImg from '../Resources/eraser.png';
 const immutable = require("immutable");
 const signalR = require('@aspnet/signalr');
 require('./drawingApp.css');
@@ -36,13 +38,7 @@ export class DrawArea extends Component {
     }
 
     componentDidMount() {
-        document.addEventListener("mouseup", this.handleMouseUp);
-        /*
-        let chosenBoardName = this.props.location.state.boardName
-        this.setState({
-            boardname: chosenBoardName
-        });
-        */
+        /*document.addEventListener("mouseup", this.handleMouseUp);*/
         const socketConnection = new signalR.HubConnectionBuilder().withUrl("/draw").configureLogging(signalR.LogLevel.Information).build();
         this.setState({ socketConnection }, () => {
             this.state.socketConnection.start().then(() => console.log('connection started')).catch(err => console.log('error while establishing connection'));
@@ -58,7 +54,7 @@ export class DrawArea extends Component {
 
     }
     componentWillUnmount() {
-        document.removeEventListener("mouseup", this.handleMouseUp);
+        /*document.removeEventListener("mouseup", this.handleMouseUp);*/
     }
 
     componentWillMount() {
@@ -67,7 +63,7 @@ export class DrawArea extends Component {
 
 
     handleMouseUp() {
-        if (this.state.mode == "pencil") {
+        if (this.state.mode === "pencil") {
             this.setState({
                 isDrawing: false
             });
@@ -114,12 +110,12 @@ export class DrawArea extends Component {
     }
 
     pushPath(somelines, path) {
-        var pathPoints = path.pathPoints;
-        var point = this.createPoint(pathPoints[0]);
+        let pathPoints = path.pathPoints;
+        let point = this.createPoint(pathPoints[0]);
         somelines = somelines.push(immutable.List([point]))
         for (var i = 1; i < pathPoints.length; i++) {
-            var point = this.createPoint(pathPoints[i]);
-            somelines = somelines.updateIn([somelines.size - 1], line => line.push(point));
+            let Point = this.createPoint(pathPoints[i]);
+            somelines = somelines.updateIn([somelines.size - 1], line => line.push(Point));
         }
         return somelines;
     }
@@ -157,6 +153,7 @@ export class DrawArea extends Component {
         });
         */
         e.currentTarget.remove();
+        console.log("in delete path");
 
     }
 
@@ -167,7 +164,7 @@ export class DrawArea extends Component {
     }
 
     handleMouseMove(mouseEvent) {
-        if (!this.state.isDrawing || this.state.mode == "eraser") {
+        if (!this.state.isDrawing || this.state.mode === "eraser") {
             return;
         }
 
@@ -181,7 +178,7 @@ export class DrawArea extends Component {
     }
 
     handleMouseDown(mouseEvent) {
-        if (mouseEvent.button != 0 || this.state.mode == "eraser") {
+        if (mouseEvent.button !== 0 || this.state.mode === "eraser") {
             return;
         }
 
@@ -217,17 +214,17 @@ export class DrawArea extends Component {
                 <br />
                 <div>
                     <ul className="optionsList">
-                        <li className="fas fa-pencil-alt"
-                            onClick={() => { this.changeMode("pencil") }} >
-                        </li>
+                        <img className="icon-img" src={pencilImg} alt="Pencil" width="40" height="40"
+                            onClick={() => { this.changeMode("pencil") }}/>
                         <br />
-                        <li className="fas fa-eraser"
-                            onClick={() => { this.changeMode("eraser") }}>
-                        </li>
+                        <br />
+                        <img className="icon-img" src={eraserImg} alt="Eraser" width="60" height="60"
+                            onClick={() => { this.changeMode("eraser") }}/>
                     </ul>
-                    <div ref={this.getdrawArea} className={"drawArea " + (this.state.mode == "pencil" ? "drawAreaCross" : "drawAreaDelete")}
+                    <div ref={this.getdrawArea} className={"drawArea " + (this.state.mode === "pencil" ? "drawAreaCross" : "drawAreaDelete")}
                         onMouseDown={this.handleMouseDown}
-                        onMouseMove={this.handleMouseMove}>
+                        onMouseMove={this.handleMouseMove}
+                        onMouseUp={() => { this.handleMouseUp() }} >
                         <Drawing
                             lines={this.state.lines}
                             deletePath={this.deletePath}

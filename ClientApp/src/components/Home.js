@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
 import { DrawArea } from './DrawArea';
 import { Redirect } from 'react-router-dom';
 import logoImg from '../Resources/homeLogo.png';

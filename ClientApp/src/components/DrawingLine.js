@@ -8,5 +8,7 @@ export default function DrawingLine(props) {
         props.line.map(p => p.get('x') + ' ' + p.get('y'))
             .join(" L ");
 
-    return <path className="path" onClick={(e)=>{props.deletePath(e)}} d={pathData} />;
+    return <path className="path"
+        onClick={(e) => { props.deletePath(e) }}
+        d={pathData} />;
 }
