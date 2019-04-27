@@ -3,8 +3,14 @@ import { DrawArea } from './DrawArea';
 import { Redirect } from 'react-router-dom';
 import logoImg from '../Resources/homeLogo.png';
 
+/**
+ * Home component used to display the home page
+ */
 export class Home extends Component {
+
     displayName = Home.name
+
+    /*Home component constructor */
     constructor() {
         super();
         this.state = {
@@ -13,16 +19,22 @@ export class Home extends Component {
         };
     }
 
+    /**
+     * Update the name of the board selected by the user
+     * @param {any} event
+     */
     handleChange(event) {
         this.setState({ title: event.target.value });
     }
 
+    /*Enables the web path replacement for the new draw baord*/
     setRedirect = () => {
         this.setState({
             redirect: true
         })
     }
 
+    /*Update the name of the current draw baord in the newly defined web path*/
     renderRedirect = () => {
         if (this.state.redirect) {
             return <Redirect
@@ -30,7 +42,6 @@ export class Home extends Component {
                     pathname: `/drawArea/${this.state.title}`,
                     state: { boardName: `${this.state.title}` }
                 }}
-
                 component={DrawArea} />
         }
     }
@@ -59,7 +70,6 @@ export class Home extends Component {
                     {this.renderRedirect()}
                     <button className="board-btn left-space" onClick={this.setRedirect}>Start Draw!</button>
                 </div>
-
             </div>
         );
     }

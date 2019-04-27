@@ -1,8 +1,9 @@
 ﻿import React from "react";
 require('./Footer.css');
 
-
-
+/**
+ * Footer component function used to display the sticky footer
+ */
 export default function Footer(props) {
     return (
         <div>

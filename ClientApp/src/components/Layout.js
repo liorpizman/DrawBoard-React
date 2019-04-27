@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Col, Grid, Row } from 'react-bootstrap';
 import { NavMenu } from './NavMenu';
 
+/**
+ * Layout component used to display the Grid 
+ */
 export class Layout extends Component {
   displayName = Layout.name
 

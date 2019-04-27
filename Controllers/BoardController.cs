@@ -10,26 +10,36 @@ using Newtonsoft.Json.Linq;
 
 namespace draw_board.Controllers
 {
+    /// <summary>
+    /// BoardController which manages all the activity on the board in the server-side according to client-side calls and vice versa
+    /// </summary>
     [Route("api/[controller]")]
     public class BoardController : Controller
     {
-
         db DB = new db();
 
+        /// <summary>
+        /// Create a new path object to insert it into the database
+        /// </summary>
+        /// <param name="path">path data from client-side</param>
+        /// <returns>new path object</returns>
         public static Path createPath(JArray path)
         {
             Point[] arr = new Point[path.Count];
             for (int i = 0; i < path.Count - 2; i++)
             {
-
                 float x = path[i]["x"].ToObject<float>();
                 float y = path[i]["y"].ToObject<float>();
                 arr[i] = new Point(x, y);
             }
-
             return new Path(arr);
         }
 
+        /// <summary>
+        /// Inserts a new path to the database and returns its unique ID obtained there
+        /// </summary>
+        /// <param name="data">path data from client-side</param>
+        /// <returns>unique ID</returns>
         [HttpPost("[action]")]
         public int addPath([FromBody] JObject data)
         {
@@ -44,14 +54,9 @@ namespace draw_board.Controllers
             {
                 cIP = ((string)ip).Split(' ')[1];
             }
-            catch (Exception e)
-            {
-                e.StackTrace.ToString();
-            }
+            catch (Exception e) { e.StackTrace.ToString(); }
             if (cIP.Equals("default"))
-            {
                 cIP = ip.ToString();
-            }
             string boardName = ((JProperty)boardData).Value.ToString();
             if (path != null)
             {
@@ -61,7 +66,12 @@ namespace draw_board.Controllers
             return pathId;
         }
 
-        [HttpPost("[action]")]                                     
+        /// <summary>
+        /// Returns all paths that belong to the current draw board from the database
+        /// </summary>
+        /// <param name="boardname">current draw board</param>
+        /// <returns>paths array</returns>
+        [HttpPost("[action]")]
         public Path[] getPath([FromBody] JObject boardname)
         {
             string board = ((JProperty)boardname.First).Value.ToString();
@@ -69,14 +79,20 @@ namespace draw_board.Controllers
             return paths;
         }
 
+        /// <summary>
+        /// Deletes a path from the database based on its unique identifier
+        /// </summary>
+        /// <param name="pathId">path unique identifier</param>
         [HttpPost("[action]")]
         public void deletePath([FromBody] int pathId)
         {
             DB.deletePathFromDB(pathId);
         }
 
-
-
+        /// <summary>
+        /// Returns the IP of the current user
+        /// </summary>
+        /// <returns>IP Address</returns>
         [HttpGet("[action]")]
         public Object getClientIp()
         {
@@ -97,7 +113,10 @@ namespace draw_board.Controllers
             return ip.Replace(".", string.Empty);
         }
 
-
+        /// <summary>
+        /// Get client's IP Address
+        /// </summary>
+        /// <returns>IP Address</returns>
         static string GetIPAddress()
         {
             String address = "";
@@ -107,28 +126,31 @@ namespace draw_board.Controllers
             {
                 address = stream.ReadToEnd();
             }
-
             int first = address.IndexOf("Address: ") + 9;
             int last = address.LastIndexOf("</body>");
             address = address.Substring(first, last - first);
-
             return address;
         }
 
-
-        public static string GetIpAddress()  // Get IP Address
+        /// <summary>
+        /// Get IP Address
+        /// </summary>
+        /// <returns>IP Address</returns>
+        public static string GetIpAddress()
         {
-            string ip = "";
             IPHostEntry ipEntry = Dns.GetHostEntry(GetCompCode());
             IPAddress[] addr = ipEntry.AddressList;
-            ip = addr[3].ToString();
+            string ip = addr[3].ToString();
             return ip;
         }
 
-        public static string GetCompCode()  // Get Computer Name
+        /// <summary>
+        /// Get Computer Name
+        /// </summary>
+        /// <returns>Name</returns>
+        public static string GetCompCode()
         {
-            string strHostName = "";
-            strHostName = Dns.GetHostName();
+            string strHostName = Dns.GetHostName();
             return strHostName;
         }
 

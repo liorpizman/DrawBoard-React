@@ -1,17 +1,11 @@
 import React from "react";
 
-function deleteLine(e) {
-    console.log("working");
-}
-
+/**
+ * Drawing component function used to display path element
+ */
 export default function DrawingLine(props) {
-    /* var lineToDraw = props.line;
-     const pathDetails = lineToDraw.getIn([props.line.size - 1]);
-     let hasConf = false;
-     if (pathDetails.ip && pathDetails.id) {
-         lineToDraw = lineToDraw.removeIn([props.line.size - 1]);
-         hasConf = true;
-     }*/
+
+    /*The x and y coordinates of the current path drawn by the user*/
     const pathData = "M " +
         props.line.points.map(p => p.get('x') + ' ' + p.get('y'))
             .join(" L ");
