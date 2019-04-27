@@ -18,4 +18,5 @@ You can enter the page at any time and see all the elements created by the diffe
 
 - ASP.NET Core and C# for server-side 
 - React for client-side 
+- Bootstrap for layout and styling
 - Microsoft SQL Server for database management
