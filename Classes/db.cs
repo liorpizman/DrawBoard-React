@@ -8,15 +8,26 @@ using System.Threading.Tasks;
 
 namespace draw_board.Classes
 {
+    /// <summary>
+    /// db class to manage queries on sql server
+    /// </summary>
     public class db
     {
         public string connectionString = "Data Source=DESKTOP-QUEN7BL\\SQLEXPRESS;Initial Catalog=draws;Integrated Security=True";
         public SqlConnection conn;
+
+        /// <summary>
+        /// db constructor for creating a new connection
+        /// </summary>
         public db()
         {
             conn = new SqlConnection(connectionString);
         }
 
+        /// <summary>
+        /// Delete a path from the database based on a unique identifier
+        /// </summary>
+        /// <param name="pathId">path unique identifier</param>
         public void deletePathFromDB(int pathId)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
@@ -33,6 +44,13 @@ namespace draw_board.Classes
             }
         }
 
+        /// <summary>
+        /// Adds a new path to the database for a board and ip address 
+        /// </summary>
+        /// <param name="pa">new path</param>
+        /// <param name="boardName">current draw board</param>
+        /// <param name="ip">client's ip</param>
+        /// <returns>unique id of path</returns>
         public int insertPath(Path pa, string boardName, string ip)
         {
             insertBoard(boardName);
@@ -45,6 +63,11 @@ namespace draw_board.Classes
             return pathId;
         }
 
+        /// <summary>
+        /// Receive all paths for a given board from the database
+        /// </summary>
+        /// <param name="boardName">given draw board</param>
+        /// <returns>all paths</returns>
         public Path[] getPath(string boardName)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
@@ -66,14 +89,17 @@ namespace draw_board.Classes
                         Point[] points = getPointsOfPath(pathId);
                         Path path = new Path(points, pathIp, pathId);
                         paths.Insert(i++, path);
-
                     }
-
                     return paths.ToArray();
                 }
             }
         }
 
+        /// <summary>
+        /// Receive all points for a given path from the database
+        /// </summary>
+        /// <param name="path">path id</param>
+        /// <returns>all points</returns>
         public Point[] getPointsOfPath(int path)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
@@ -94,12 +120,15 @@ namespace draw_board.Classes
                         Point p = new Point(x, y);
                         points.Insert(i++, p);
                     }
-
                     return points.ToArray();
                 }
             }
         }
 
+        /// <summary>
+        /// Insert a new draw board into the database
+        /// </summary>
+        /// <param name="boardName">new draw board</param>
         public void insertBoard(string boardName)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
@@ -116,7 +145,12 @@ namespace draw_board.Classes
             }
         }
 
-
+        /// <summary>
+        /// Insert a new path record based on the draw board name and ip address
+        /// </summary>
+        /// <param name="ip">ip address</param>
+        /// <param name="boardName">draw board name</param>
+        /// <returns>path id</returns>
         public int insertIp(string ip, string boardName)
         {
             using (SqlConnection openCon = new SqlConnection(connectionString))
@@ -135,9 +169,13 @@ namespace draw_board.Classes
             }
         }
 
+        /// <summary>
+        /// Insert a new point for a given path to the database
+        /// </summary>
+        /// <param name="p">given point</param>
+        /// <param name="pathId">path id</param>
         public void insertPoint(Point p, int pathId)
         {
-            //if()
             using (SqlConnection openCon = new SqlConnection(connectionString))
             {
                 string insertPoint = "INSERT into pathinfo (path,x,y) VALUES (@path,@x,@y)";
